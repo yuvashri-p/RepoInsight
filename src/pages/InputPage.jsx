@@ -1,64 +1,49 @@
-
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+const GITHUB_URL = /^https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/?$/
+
 export default function InputPage() {
-  const [repoUrl, setRepoUrl] = useState('')
+  const [url, setUrl] = useState('')
   const [error, setError] = useState('')
   const navigate = useNavigate()
 
   function handleSubmit(e) {
     e.preventDefault()
-
-    const pattern = /^https:\/\/github\.com\/[^/]+\/[^/]+\/?$/
-
-    if (!pattern.test(repoUrl.trim())) {
-      setError('Enter a valid GitHub repository URL.')
+    const trimmed = url.trim()
+    if (!GITHUB_URL.test(trimmed)) {
+      setError('Enter a valid URL like https://github.com/owner/repo')
       return
     }
-
     setError('')
-    navigate(`/dashboard?repo=${encodeURIComponent(repoUrl.trim())}`)
+    navigate(`/dashboard?repo=${encodeURIComponent(trimmed)}`)
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gray-50 p-6">
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-xl rounded-2xl bg-white p-8 shadow-lg"
-      >
-        <h1 className="mb-3 text-3xl font-bold text-blue-600">
-          RepoInsight
-        </h1>
+    <div className="max-w-2xl mx-auto px-4 py-12 md:py-20 text-center">
+      <h1 className="text-3xl md:text-4xl font-bold">RepoInsight</h1>
+      <p className="mt-3 text-gray-600">
+        Paste a GitHub repository to find potentially risky files and get an
+        AI-generated onboarding guide.
+      </p>
 
-        <p className="mb-6 text-gray-600">
-          Discover potentially risky files in a GitHub repository.
-        </p>
-
-        <label className="mb-2 block font-medium" htmlFor="repoUrl">
-          GitHub Repository URL
-        </label>
-
+      <form onSubmit={handleSubmit} className="mt-8 flex flex-col sm:flex-row gap-3">
         <input
-          id="repoUrl"
-          type="url"
-          value={repoUrl}
-          onChange={e => setRepoUrl(e.target.value)}
-          placeholder="https://github.com/owner/repository"
-          className="mb-4 w-full rounded-lg border border-gray-300 p-3 outline-none focus:border-blue-500"
+          type="text"
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          placeholder="https://github.com/owner/repo"
+          className="flex-1 border rounded px-4 py-3 bg-white"
         />
-
-        {error && (
-          <p className="mb-4 text-sm text-red-600">{error}</p>
-        )}
-
         <button
           type="submit"
-          className="w-full rounded-lg bg-blue-600 p-3 font-semibold text-white hover:bg-blue-700"
+          className="bg-blue-600 text-white rounded px-6 py-3 font-semibold hover:bg-blue-700"
         >
-          Analyze Repository
+          Analyze
         </button>
       </form>
-    </main>
+
+      {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
+    </div>
   )
 }
